@@ -1,0 +1,612 @@
+Archive member included to satisfy reference by file (symbol)
+
+c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+                              c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o (exit)
+c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+                              ./src/progger.o (__tablejump2__)
+c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+                              ./src/progger.o (__do_copy_data)
+c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+                              ./src/main.o (__do_clear_bss)
+
+Allocating common symbols
+Common symbol       size              file
+
+param               0x13              ./src/main.o
+buff                0x100             ./src/progger.o
+exchange            0x100             ./src/main.o
+here                0x2               ./src/progger.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x00000000         0x00020000         xr
+data             0x00800060         0x0000ffa0         rw !x
+eeprom           0x00810000         0x00010000         rw !x
+fuse             0x00820000         0x00000003         rw !x
+lock             0x00830000         0x00000400         rw !x
+signature        0x00840000         0x00000400         rw !x
+user_signatures  0x00850000         0x00000400         rw !x
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+Address of section .data set to 0x800100
+LOAD c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+LOAD ./src/main.o
+LOAD ./src/progger.o
+LOAD ./src/spi.o
+LOAD ./src/uart.o
+START GROUP
+LOAD c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a
+LOAD c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libm.a
+LOAD c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a
+LOAD c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libatmega328p.a
+END GROUP
+                0x00020000                __TEXT_REGION_LENGTH__ = DEFINED (__TEXT_REGION_LENGTH__)?__TEXT_REGION_LENGTH__:0x20000
+                0x0000ffa0                __DATA_REGION_LENGTH__ = DEFINED (__DATA_REGION_LENGTH__)?__DATA_REGION_LENGTH__:0xffa0
+                0x00010000                __EEPROM_REGION_LENGTH__ = DEFINED (__EEPROM_REGION_LENGTH__)?__EEPROM_REGION_LENGTH__:0x10000
+                [0x00000003]                __FUSE_REGION_LENGTH__ = DEFINED (__FUSE_REGION_LENGTH__)?__FUSE_REGION_LENGTH__:0x400
+                0x00000400                __LOCK_REGION_LENGTH__ = DEFINED (__LOCK_REGION_LENGTH__)?__LOCK_REGION_LENGTH__:0x400
+                0x00000400                __SIGNATURE_REGION_LENGTH__ = DEFINED (__SIGNATURE_REGION_LENGTH__)?__SIGNATURE_REGION_LENGTH__:0x400
+                0x00000400                __USER_SIGNATURE_REGION_LENGTH__ = DEFINED (__USER_SIGNATURE_REGION_LENGTH__)?__USER_SIGNATURE_REGION_LENGTH__:0x400
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x00000000      0xc2c
+ *(.vectors)
+ .vectors       0x00000000       0x68 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+                0x00000000                __vector_default
+                0x00000000                __vectors
+ *(.vectors)
+ *(.progmem.gcc*)
+ .progmem.gcc_sw_table.avrisp
+                0x00000068       0xac ./src/progger.o
+                0x00000114                . = ALIGN (0x2)
+                0x00000114                __trampolines_start = .
+ *(.trampolines)
+ .trampolines   0x00000114        0x0 linker stubs
+ *(.trampolines*)
+                0x00000114                __trampolines_end = .
+ *libprintf_flt.a:*(.progmem.data)
+ *libc.a:*(.progmem.data)
+ *(.progmem*)
+                0x00000114                . = ALIGN (0x2)
+ *(.jumptables)
+ *(.jumptables*)
+ *(.lowtext)
+ *(.lowtext*)
+                0x00000114                __ctors_start = .
+ *(.ctors)
+                0x00000114                __ctors_end = .
+                0x00000114                __dtors_start = .
+ *(.dtors)
+                0x00000114                __dtors_end = .
+ SORT(*)(.ctors)
+ SORT(*)(.dtors)
+ *(.init0)
+ .init0         0x00000114        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+                0x00000114                __init
+ *(.init0)
+ *(.init1)
+ *(.init1)
+ *(.init2)
+ .init2         0x00000114        0xc c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+ *(.init2)
+ *(.init3)
+ *(.init3)
+ *(.init4)
+ .init4         0x00000120       0x16 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+                0x00000120                __do_copy_data
+ .init4         0x00000136       0x10 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+                0x00000136                __do_clear_bss
+ *(.init4)
+ *(.init5)
+ *(.init5)
+ *(.init6)
+ *(.init6)
+ *(.init7)
+ *(.init7)
+ *(.init8)
+ *(.init8)
+ *(.init9)
+ .init9         0x00000146        0x8 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+ *(.init9)
+ *(.text)
+ .text          0x0000014e        0x4 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+                0x0000014e                __vector_22
+                0x0000014e                __vector_1
+                0x0000014e                __vector_24
+                0x0000014e                __vector_12
+                0x0000014e                __bad_interrupt
+                0x0000014e                __vector_6
+                0x0000014e                __vector_3
+                0x0000014e                __vector_23
+                0x0000014e                __vector_25
+                0x0000014e                __vector_11
+                0x0000014e                __vector_13
+                0x0000014e                __vector_17
+                0x0000014e                __vector_19
+                0x0000014e                __vector_7
+                0x0000014e                __vector_5
+                0x0000014e                __vector_4
+                0x0000014e                __vector_9
+                0x0000014e                __vector_2
+                0x0000014e                __vector_21
+                0x0000014e                __vector_15
+                0x0000014e                __vector_8
+                0x0000014e                __vector_14
+                0x0000014e                __vector_10
+                0x0000014e                __vector_16
+                0x0000014e                __vector_20
+ .text          0x00000152        0x0 ./src/main.o
+ .text          0x00000152        0x0 ./src/progger.o
+ .text          0x00000152        0x0 ./src/spi.o
+ .text          0x00000152        0x0 ./src/uart.o
+ .text          0x00000152        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text          0x00000152        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .text          0x00000152        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text          0x00000152        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+                0x00000152                . = ALIGN (0x2)
+ *(.text.*)
+ .text.__vector_18
+                0x00000152       0x46 ./src/main.o
+                0x00000152                __vector_18
+ .text.main     0x00000198       0x30 ./src/main.o
+                0x00000198                main
+ .text.pulse    0x000001c8       0x98 ./src/progger.o
+                0x000001c8                pulse
+ .text.setup    0x00000260       0x30 ./src/progger.o
+                0x00000260                setup
+ .text.reset_target
+                0x00000290       0x1e ./src/progger.o
+                0x00000290                reset_target
+ .text.Serial_available
+                0x000002ae       0x12 ./src/progger.o
+                0x000002ae                Serial_available
+ .text.getch    0x000002c0       0x20 ./src/progger.o
+                0x000002c0                getch
+ .text.fill     0x000002e0       0x2e ./src/progger.o
+                0x000002e0                fill
+ .text.prog_lamp
+                0x0000030e        0xc ./src/progger.o
+                0x0000030e                prog_lamp
+ .text.spi_transaction
+                0x0000031a       0x2a ./src/progger.o
+                0x0000031a                spi_transaction
+ .text.empty_reply
+                0x00000344       0x30 ./src/progger.o
+                0x00000344                empty_reply
+ .text.breply   0x00000374       0x3c ./src/progger.o
+                0x00000374                breply
+ .text.get_version
+                0x000003b0       0x3e ./src/progger.o
+                0x000003b0                get_version
+ .text.set_parameters
+                0x000003ee       0xf2 ./src/progger.o
+                0x000003ee                set_parameters
+ .text.start_pmode
+                0x000004e0       0x66 ./src/progger.o
+                0x000004e0                start_pmode
+ .text.end_pmode
+                0x00000546       0x16 ./src/progger.o
+                0x00000546                end_pmode
+ .text.universal
+                0x0000055c       0x1e ./src/progger.o
+                0x0000055c                universal
+ .text.flash    0x0000057a       0x14 ./src/progger.o
+                0x0000057a                flash
+ .text.commit   0x0000058e       0x3e ./src/progger.o
+                0x0000058e                commit
+ .text.current_page
+                0x000005cc       0x5a ./src/progger.o
+                0x000005cc                current_page
+ .text.write_flash_pages
+                0x00000626       0x92 ./src/progger.o
+                0x00000626                write_flash_pages
+ .text.write_flash
+                0x000006b8       0x42 ./src/progger.o
+                0x000006b8                write_flash
+ .text.write_eeprom_chunk
+                0x000006fa       0x62 ./src/progger.o
+                0x000006fa                write_eeprom_chunk
+ .text.write_eeprom
+                0x0000075c       0xca ./src/progger.o
+                0x0000075c                write_eeprom
+ .text.program_page
+                0x00000826       0x70 ./src/progger.o
+                0x00000826                program_page
+ .text.flash_read
+                0x00000896       0x14 ./src/progger.o
+                0x00000896                flash_read
+ .text.flash_read_page
+                0x000008aa       0x60 ./src/progger.o
+                0x000008aa                flash_read_page
+ .text.eeprom_read_page
+                0x0000090a       0x44 ./src/progger.o
+                0x0000090a                eeprom_read_page
+ .text.read_page
+                0x0000094e       0x76 ./src/progger.o
+                0x0000094e                read_page
+ .text.read_signature
+                0x000009c4       0x60 ./src/progger.o
+                0x000009c4                read_signature
+ .text.avrisp   0x00000a24      0x158 ./src/progger.o
+                0x00000a24                avrisp
+ .text.spi_init
+                0x00000b7c       0x42 ./src/spi.o
+                0x00000b7c                spi_init
+ .text.spi_deinit
+                0x00000bbe        0x8 ./src/spi.o
+                0x00000bbe                spi_deinit
+ .text.SPI_transfer
+                0x00000bc6        0xc ./src/spi.o
+                0x00000bc6                SPI_transfer
+ .text.uart_init
+                0x00000bd2       0x1c ./src/uart.o
+                0x00000bd2                uart_init
+ .text.uart_sendChar
+                0x00000bee       0x10 ./src/uart.o
+                0x00000bee                uart_sendChar
+ .text.uart_sendString
+                0x00000bfe       0x1e ./src/uart.o
+                0x00000bfe                uart_sendString
+ .text.libgcc.mul
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc.div
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc   0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc.prologue
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc.builtins
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc.fmul
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc.fixed
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .text.libgcc.mul
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.div
+                0x00000c1c        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc   0x00000c1c        0xc c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+                0x00000c1c                __tablejump2__
+ .text.libgcc.prologue
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.builtins
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.fmul
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.fixed
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.mul
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc.div
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc   0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc.prologue
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc.builtins
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc.fmul
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc.fixed
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .text.libgcc.mul
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.div
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc   0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.prologue
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.builtins
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.fmul
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ .text.libgcc.fixed
+                0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+                0x00000c28                . = ALIGN (0x2)
+ *(.fini9)
+ .fini9         0x00000c28        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+                0x00000c28                _exit
+                0x00000c28                exit
+ *(.fini9)
+ *(.fini8)
+ *(.fini8)
+ *(.fini7)
+ *(.fini7)
+ *(.fini6)
+ *(.fini6)
+ *(.fini5)
+ *(.fini5)
+ *(.fini4)
+ *(.fini4)
+ *(.fini3)
+ *(.fini3)
+ *(.fini2)
+ *(.fini2)
+ *(.fini1)
+ *(.fini1)
+ *(.fini0)
+ .fini0         0x00000c28        0x4 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ *(.fini0)
+                0x00000c2c                _etext = .
+
+.data           0x00800100        0x8 load address 0x00000c2c
+                0x00800100                PROVIDE (__data_start, .)
+ *(.data)
+ .data          0x00800100        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+ .data          0x00800100        0x0 ./src/main.o
+ .data          0x00800100        0x0 ./src/progger.o
+ .data          0x00800100        0x0 ./src/spi.o
+ .data          0x00800100        0x0 ./src/uart.o
+ .data          0x00800100        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .data          0x00800100        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .data          0x00800100        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .data          0x00800100        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ *(.data*)
+ *(.rodata)
+ *(.rodata*)
+ .rodata.str1.1
+                0x00800100        0x8 ./src/progger.o
+ *(.gnu.linkonce.d*)
+                0x00800108                . = ALIGN (0x2)
+                0x00800108                _edata = .
+                0x00800108                PROVIDE (__data_end, .)
+
+.bss            0x00800108      0x21c
+                0x00800108                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x00800108        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+ .bss           0x00800108        0x0 ./src/main.o
+ .bss           0x00800108        0x0 ./src/progger.o
+ .bss           0x00800108        0x0 ./src/spi.o
+ .bss           0x00800108        0x0 ./src/uart.o
+ .bss           0x00800108        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .bss           0x00800108        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_tablejump2.o)
+ .bss           0x00800108        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
+ .bss           0x00800108        0x0 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
+ *(.bss*)
+ .bss.rx_rd_index0
+                0x00800108        0x1 ./src/main.o
+                0x00800108                rx_rd_index0
+ .bss.rx_wr_index0
+                0x00800109        0x1 ./src/main.o
+                0x00800109                rx_wr_index0
+ .bss.rst_active_high
+                0x0080010a        0x1 ./src/progger.o
+ .bss.pmode     0x0080010b        0x2 ./src/progger.o
+                0x0080010b                pmode
+ .bss.error     0x0080010d        0x2 ./src/progger.o
+                0x0080010d                error
+ *(COMMON)
+ COMMON         0x0080010f      0x113 ./src/main.o
+                0x0080010f                param
+                0x00800122                exchange
+ COMMON         0x00800222      0x102 ./src/progger.o
+                0x00800222                buff
+                0x00800322                here
+                0x00800324                PROVIDE (__bss_end, .)
+                0x00000c2c                __data_load_start = LOADADDR (.data)
+                0x00000c34                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x00800324        0x0
+                [!provide]                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                [!provide]                PROVIDE (__noinit_end, .)
+                0x00800324                _end = .
+                [!provide]                PROVIDE (__heap_start, .)
+
+.eeprom         0x00810000        0x0
+ *(.eeprom*)
+                0x00810000                __eeprom_end = .
+
+.fuse
+ *(.fuse)
+ *(.lfuse)
+ *(.hfuse)
+ *(.efuse)
+
+.lock
+ *(.lock*)
+
+.signature
+ *(.signature*)
+
+.user_signatures
+ *(.user_signatures*)
+
+.stab           0x00000000     0x22e0
+ *(.stab)
+ .stab          0x00000000      0x5d0 ./src/main.o
+ .stab          0x000005d0     0x1584 ./src/progger.o
+                               0x1770 (size before relaxing)
+ .stab          0x00001b54      0x3e4 ./src/spi.o
+                                0x5ac (size before relaxing)
+ .stab          0x00001f38      0x3a8 ./src/uart.o
+                                0x570 (size before relaxing)
+
+.stabstr        0x00000000     0x12c0
+ *(.stabstr)
+ .stabstr       0x00000000     0x12c0 ./src/main.o
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000       0x30
+ *(.comment)
+ .comment       0x00000000       0x30 ./src/main.o
+                                 0x31 (size before relaxing)
+ .comment       0x00000030       0x31 ./src/progger.o
+ .comment       0x00000030       0x31 ./src/spi.o
+ .comment       0x00000030       0x31 ./src/uart.o
+
+.note.gnu.avr.deviceinfo
+                0x00000000       0x40
+ .note.gnu.avr.deviceinfo
+                0x00000000       0x40 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+
+.note.gnu.build-id
+ *(.note.gnu.build-id)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x00000000      0x5f4
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000      0x5f4 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+
+.debug_abbrev   0x00000000      0x5a2
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000      0x5a2 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+
+.debug_line     0x00000000       0x1a
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x00000000       0x1a c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str      0x00000000      0x208
+ *(.debug_str)
+ .debug_str     0x00000000      0x208 c:/avr8-gnu-toolchain_for_eclipse/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5/crtatmega328p.o
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_macro
+ *(.debug_macro)
+OUTPUT(avr_isp.elf elf32-avr)
+LOAD linker stubs
