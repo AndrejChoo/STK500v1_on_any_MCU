@@ -1,0 +1,442 @@
+[p GLOBOPT AUTOSTATIC IEEE_DBL IEEE_FLT PIC14 PIC14E ]
+[d version 1.1 ]
+[d edition pro ]
+[d chip 16F1938 ]
+[d frameptr 6 ]
+"10 C:\Program Files\Microchip\xc8\v2.31\pic\sources\c99\common\sprcadd.c
+[v ___fladd __fladd `(d  1 e 4 0 ]
+"4 C:\Program Files\Microchip\xc8\v2.31\pic\sources\c99\common\Umul8_16.c
+[v __Umul8_16 _Umul8_16 `(ui  1 e 2 0 ]
+"6 C:\Program Files\Microchip\xc8\v2.31\pic\sources\c99\pic\__eeprom.c
+[v ___eecpymem __eecpymem `(v  1 e 1 0 ]
+"39
+[v ___memcpyee __memcpyee `(v  1 e 1 0 ]
+"44 D:\PIC_Projects\avrisp\avrisp.X\main.c
+[v _ISR ISR `II(v  1 e 1 0 ]
+"54
+[v _main main `(v  1 e 1 0 ]
+"28 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _setup setup `(v  1 e 1 0 ]
+"43
+[v _pulse pulse `(v  1 e 1 0 ]
+"72
+[v _reset_target reset_target `(v  1 e 1 0 ]
+"78
+[v _Serial_available Serial_available `(uc  1 e 1 0 ]
+"84
+[v _getch getch `(uc  1 e 1 0 ]
+"93
+[v _fill fill `(v  1 e 1 0 ]
+"98
+[v _prog_lamp prog_lamp `(v  1 e 1 0 ]
+"107
+[v _spi_transaction spi_transaction `(uc  1 e 1 0 ]
+"115
+[v _empty_reply empty_reply `(v  1 e 1 0 ]
+"129
+[v _breply breply `(v  1 e 1 0 ]
+"144
+[v _get_version get_version `(v  1 e 1 0 ]
+"164
+[v _set_parameters set_parameters `(v  1 e 1 0 ]
+"191
+[v _start_pmode start_pmode `(v  1 e 1 0 ]
+"220
+[v _end_pmode end_pmode `(v  1 e 1 0 ]
+"228
+[v _universal universal `(v  1 e 1 0 ]
+"237
+[v _flash flash `(v  1 e 1 0 ]
+"245
+[v _commit commit `(v  1 e 1 0 ]
+"259
+[v _current_page current_page `(ui  1 e 2 0 ]
+"280
+[v _write_flash write_flash `(v  1 e 1 0 ]
+"295
+[v _write_flash_pages write_flash_pages `(uc  1 e 1 0 ]
+"316
+[v _write_eeprom write_eeprom `(uc  1 e 1 0 ]
+"336
+[v _write_eeprom_chunk write_eeprom_chunk `(uc  1 e 1 0 ]
+"351
+[v _program_page program_page `(v  1 e 1 0 ]
+"382
+[v _flash_read flash_read `(uc  1 e 1 0 ]
+"390
+[v _flash_read_page flash_read_page `(uc  1 e 1 0 ]
+"403
+[v _eeprom_read_page eeprom_read_page `(uc  1 e 1 0 ]
+"416
+[v _read_page read_page `(v  1 e 1 0 ]
+"434
+[v _read_signature read_signature `(v  1 e 1 0 ]
+"454
+[v _avrisp avrisp `(v  1 e 1 0 ]
+"5 D:\PIC_Projects\avrisp\avrisp.X\spi.c
+[v _spi_init spi_init `(v  1 e 1 0 ]
+"15
+[v _SPI_transfer SPI_transfer `(uc  1 e 1 0 ]
+"40
+[v _spi_deinit spi_deinit `(v  1 e 1 0 ]
+"3 D:\PIC_Projects\avrisp\avrisp.X\uart.c
+[v _uart_init uart_init `(v  1 e 1 0 ]
+"15
+[v _uart_sendChar uart_sendChar `(v  1 e 1 0 ]
+"21
+[v _uart_sendString uart_sendString `(v  1 e 1 0 ]
+[s S22 param 19 `uc 1 devicecode 1 0 `uc 1 revision 1 1 `uc 1 progtype 1 2 `uc 1 parmode 1 3 `uc 1 polling 1 4 `uc 1 selftimed 1 5 `uc 1 lockbytes 1 6 `uc 1 fusebytes 1 7 `uc 1 flashpoll 1 8 `us 1 eeprompoll 2 9 `us 1 pagesize 2 11 `us 1 eepromsize 2 13 `ul 1 flashsize 4 15 ]
+"78 D:\PIC_Projects\avrisp\avrisp.X/progger.h
+[v _param param `S22  1 e 19 0 ]
+"352 D:/Programs/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16f1938.h
+[v _INTCON INTCON `VEuc  1 e 1 @11 ]
+"430
+[v _PORTA PORTA `VEuc  1 e 1 @12 ]
+"554
+[v _PORTC PORTC `VEuc  1 e 1 @14 ]
+"1229
+[v _TRISA TRISA `VEuc  1 e 1 @140 ]
+"1353
+[v _TRISC TRISC `VEuc  1 e 1 @142 ]
+"3388
+[v _RCREG RCREG `VEuc  1 e 1 @409 ]
+"3408
+[v _TXREG TXREG `VEuc  1 e 1 @410 ]
+"3440
+[v _SPBRG SPBRG `VEuc  1 e 1 @411 ]
+"3527
+[v _RCSTA RCSTA `VEuc  1 e 1 @413 ]
+"3589
+[v _TXSTA TXSTA `VEuc  1 e 1 @414 ]
+"3916
+[v _SSPCON1 SSPCON1 `VEuc  1 e 1 @533 ]
+"8233
+[v _RCIE RCIE `VEb  1 e 0 @1165 ]
+"8236
+[v _RCIF RCIF `VEb  1 e 0 @141 ]
+"8902
+[v _TRISC3 TRISC3 `VEb  1 e 0 @1139 ]
+"8905
+[v _TRISC4 TRISC4 `VEb  1 e 0 @1140 ]
+"8908
+[v _TRISC5 TRISC5 `VEb  1 e 0 @1141 ]
+"8920
+[v _TRMT TRMT `VEb  1 e 0 @3313 ]
+"37 D:\PIC_Projects\avrisp\avrisp.X\main.c
+[v _exchange exchange `[256]uc  1 e 256 @8944 ]
+"38
+[v _rx_wr_index0 rx_wr_index0 `VEuc  1 e 1 0 ]
+[v _rx_rd_index0 rx_rd_index0 `VEuc  1 e 1 0 ]
+"15 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _errors errors `i  1 e 2 0 ]
+"16
+[v _pmode pmode `i  1 e 2 0 ]
+"18
+[v _here here `ui  1 e 2 0 ]
+"23
+[v _buff buff `[256]uc  1 e 256 @8688 ]
+"25
+[v _rst_active_high rst_active_high `uc  1 s 1 rst_active_high ]
+"54 D:\PIC_Projects\avrisp\avrisp.X\main.c
+[v _main main `(v  1 e 1 0 ]
+{
+"72
+} 0
+"28 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _setup setup `(v  1 e 1 0 ]
+{
+"41
+} 0
+"3 D:\PIC_Projects\avrisp\avrisp.X\uart.c
+[v _uart_init uart_init `(v  1 e 1 0 ]
+{
+"13
+} 0
+"43 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _pulse pulse `(v  1 e 1 0 ]
+{
+[v pulse@pin pin `i  1 p 2 2 ]
+[v pulse@tmes tmes `i  1 p 2 4 ]
+"70
+} 0
+"454
+[v _avrisp avrisp `(v  1 e 1 0 ]
+{
+"456
+[v avrisp@ch ch `uc  1 a 1 34 ]
+"568
+} 0
+"228
+[v _universal universal `(v  1 e 1 0 ]
+{
+"230
+[v universal@ch ch `uc  1 a 1 9 ]
+"235
+} 0
+"21 D:\PIC_Projects\avrisp\avrisp.X\uart.c
+[v _uart_sendString uart_sendString `(v  1 e 1 0 ]
+{
+"23
+[v uart_sendString@i i `i  1 a 2 6 ]
+"21
+[v uart_sendString@str str `*.25uc  1 p 2 3 ]
+"25
+} 0
+"191 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _start_pmode start_pmode `(v  1 e 1 0 ]
+{
+"218
+} 0
+"5 D:\PIC_Projects\avrisp\avrisp.X\spi.c
+[v _spi_init spi_init `(v  1 e 1 0 ]
+{
+"13
+} 0
+"164 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _set_parameters set_parameters `(v  1 e 1 0 ]
+{
+"189
+} 0
+"434
+[v _read_signature read_signature `(v  1 e 1 0 ]
+{
+"447
+[v read_signature@low low `uc  1 a 1 7 ]
+"445
+[v read_signature@middle middle `uc  1 a 1 6 ]
+"443
+[v read_signature@high high `uc  1 a 1 5 ]
+"450
+} 0
+"416
+[v _read_page read_page `(v  1 e 1 0 ]
+{
+"419
+[v read_page@length length `i  1 a 2 21 ]
+"421
+[v read_page@memtype memtype `uc  1 a 1 20 ]
+"418
+[v read_page@result result `uc  1 a 1 19 ]
+"432
+} 0
+"390
+[v _flash_read_page flash_read_page `(uc  1 e 1 0 ]
+{
+"396
+[v flash_read_page@high high `uc  1 a 1 12 ]
+"394
+[v flash_read_page@low low `uc  1 a 1 11 ]
+"392
+[v flash_read_page@x x `i  1 a 2 13 ]
+"390
+[v flash_read_page@length length `i  1 p 2 8 ]
+"401
+} 0
+"382
+[v _flash_read flash_read `(uc  1 e 1 0 ]
+{
+[v flash_read@hilo hilo `uc  1 a 1 wreg ]
+[v flash_read@hilo hilo `uc  1 a 1 wreg ]
+[v flash_read@addr addr `ui  1 p 2 3 ]
+"384
+[v flash_read@hilo hilo `uc  1 a 1 9 ]
+"388
+} 0
+"403
+[v _eeprom_read_page eeprom_read_page `(uc  1 e 1 0 ]
+{
+"409
+[v eeprom_read_page@addr addr `i  1 a 2 12 ]
+"410
+[v eeprom_read_page@ee ee `uc  1 a 1 11 ]
+"407
+[v eeprom_read_page@x x `i  1 a 2 14 ]
+"406
+[v eeprom_read_page@start start `i  1 a 2 9 ]
+"403
+[v eeprom_read_page@length length `i  1 p 2 3 ]
+"414
+} 0
+"351
+[v _program_page program_page `(v  1 e 1 0 ]
+{
+"354
+[v program_page@length length `ui  1 a 2 29 ]
+"356
+[v program_page@memtype memtype `uc  1 a 1 28 ]
+"353
+[v program_page@result result `uc  1 a 1 27 ]
+"380
+} 0
+"280
+[v _write_flash write_flash `(v  1 e 1 0 ]
+{
+[v write_flash@length length `i  1 p 2 19 ]
+"293
+} 0
+"295
+[v _write_flash_pages write_flash_pages `(uc  1 e 1 0 ]
+{
+"297
+[v write_flash_pages@x x `i  1 a 2 17 ]
+"298
+[v write_flash_pages@page page `ui  1 a 2 15 ]
+"295
+[v write_flash_pages@length length `i  1 p 2 10 ]
+"314
+} 0
+"237
+[v _flash flash `(v  1 e 1 0 ]
+{
+[v flash@hilo hilo `uc  1 a 1 wreg ]
+[v flash@hilo hilo `uc  1 a 1 wreg ]
+[v flash@addr addr `ui  1 p 2 3 ]
+[v flash@data data `uc  1 p 1 5 ]
+"239
+[v flash@hilo hilo `uc  1 a 1 9 ]
+"243
+} 0
+"259
+[v _current_page current_page `(ui  1 e 2 0 ]
+{
+"278
+} 0
+"245
+[v _commit commit `(v  1 e 1 0 ]
+{
+"254
+[v commit@i i `i  1 a 2 7 ]
+"245
+[v commit@addr addr `ui  1 p 2 3 ]
+"257
+} 0
+"316
+[v _write_eeprom write_eeprom `(uc  1 e 1 0 ]
+{
+"320
+[v write_eeprom@remaining remaining `ui  1 a 2 22 ]
+"319
+[v write_eeprom@start start `ui  1 a 2 20 ]
+"316
+[v write_eeprom@length length `ui  1 p 2 18 ]
+"334
+} 0
+"336
+[v _write_eeprom_chunk write_eeprom_chunk `(uc  1 e 1 0 ]
+{
+"343
+[v write_eeprom_chunk@addr addr `ui  1 a 2 14 ]
+"341
+[v write_eeprom_chunk@x x `ui  1 a 2 16 ]
+"336
+[v write_eeprom_chunk@start start `ui  1 p 2 5 ]
+[v write_eeprom_chunk@length length `ui  1 p 2 7 ]
+"349
+} 0
+"107
+[v _spi_transaction spi_transaction `(uc  1 e 1 0 ]
+{
+[v spi_transaction@a a `uc  1 a 1 wreg ]
+[v spi_transaction@a a `uc  1 a 1 wreg ]
+[v spi_transaction@b b `uc  1 p 1 0 ]
+[v spi_transaction@c c `uc  1 p 1 1 ]
+[v spi_transaction@d d `uc  1 p 1 2 ]
+"109
+[v spi_transaction@a a `uc  1 a 1 8 ]
+"113
+} 0
+"15 D:\PIC_Projects\avrisp\avrisp.X\spi.c
+[v _SPI_transfer SPI_transfer `(uc  1 e 1 0 ]
+{
+[v SPI_transfer@dat dat `uc  1 a 1 wreg ]
+"25
+[v SPI_transfer@i i `ui  1 a 2 6 ]
+"23
+[v SPI_transfer@rslt rslt `uc  1 a 1 5 ]
+"15
+[v SPI_transfer@dat dat `uc  1 a 1 wreg ]
+"23
+[v SPI_transfer@dat dat `uc  1 a 1 4 ]
+"38
+} 0
+"98 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _prog_lamp prog_lamp `(v  1 e 1 0 ]
+{
+[v prog_lamp@state state `i  1 p 2 2 ]
+"105
+} 0
+"93
+[v _fill fill `(v  1 e 1 0 ]
+{
+"95
+[v fill@x x `i  1 a 2 6 ]
+"93
+[v fill@n n `i  1 p 2 4 ]
+"96
+} 0
+"144
+[v _get_version get_version `(v  1 e 1 0 ]
+{
+[v get_version@c c `uc  1 a 1 wreg ]
+[v get_version@c c `uc  1 a 1 wreg ]
+[v get_version@c c `uc  1 a 1 7 ]
+"162
+} 0
+"129
+[v _breply breply `(v  1 e 1 0 ]
+{
+[v breply@b b `uc  1 a 1 wreg ]
+[v breply@b b `uc  1 a 1 wreg ]
+"131
+[v breply@b b `uc  1 a 1 4 ]
+"142
+} 0
+"220
+[v _end_pmode end_pmode `(v  1 e 1 0 ]
+{
+"226
+} 0
+"40 D:\PIC_Projects\avrisp\avrisp.X\spi.c
+[v _spi_deinit spi_deinit `(v  1 e 1 0 ]
+{
+"48
+} 0
+"72 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _reset_target reset_target `(v  1 e 1 0 ]
+{
+[v reset_target@reset reset `uc  1 a 1 wreg ]
+[v reset_target@reset reset `uc  1 a 1 wreg ]
+"74
+[v reset_target@reset reset `uc  1 a 1 3 ]
+"76
+} 0
+"115
+[v _empty_reply empty_reply `(v  1 e 1 0 ]
+{
+"127
+} 0
+"15 D:\PIC_Projects\avrisp\avrisp.X\uart.c
+[v _uart_sendChar uart_sendChar `(v  1 e 1 0 ]
+{
+[v uart_sendChar@ch ch `uc  1 a 1 wreg ]
+[v uart_sendChar@ch ch `uc  1 a 1 wreg ]
+[v uart_sendChar@ch ch `uc  1 a 1 2 ]
+"19
+} 0
+"84 D:\PIC_Projects\avrisp\avrisp.X\progger.c
+[v _getch getch `(uc  1 e 1 0 ]
+{
+"86
+[v getch@temp temp `uc  1 a 1 3 ]
+"91
+} 0
+"78
+[v _Serial_available Serial_available `(uc  1 e 1 0 ]
+{
+"82
+} 0
+"44 D:\PIC_Projects\avrisp\avrisp.X\main.c
+[v _ISR ISR `II(v  1 e 1 0 ]
+{
+"51
+} 0
