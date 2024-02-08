@@ -1,0 +1,8 @@
+"src/delay.o"
+"src/main.o"
+"src/progger.o"
+"src/rcc.o"
+"src/spi.o"
+"src/uart.o"
+"startup/startup_stm32.o"
+"startup/sysmem.o"
