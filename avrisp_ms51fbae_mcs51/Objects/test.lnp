@@ -1,0 +1,10 @@
+".\Objects\main.obj",
+".\Objects\STARTUP.obj",
+".\Objects\delay.obj",
+".\Objects\spi.obj",
+".\Objects\sys.obj",
+".\Objects\usart.obj",
+".\Objects\programmer.obj" 
+TO ".\Objects\test" 
+PRINT(".\Listings\test.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 

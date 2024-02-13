@@ -1,0 +1,60 @@
+C51 COMPILER V9.60.0.0   SPI                                                               02/09/2024 16:39:10 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SPI
+OBJECT MODULE PLACED IN .\Objects\spi.obj
+COMPILER INVOKED BY: D:\Programs\Keil_v5\C51\BIN\C51.EXE src\spi.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\inc) DEBUG OBJECTEX
+                    -TEND PRINT(.\Listings\spi.lst) OBJECT(.\Objects\spi.obj)
+
+line level    source
+
+   1          #include "spi.h"
+   2          #include "MS51_16K.h"
+   3          
+   4          void spi_init(void)
+   5          {
+   6   1              P0M1&=0xFE; P0M2|=0x01;   //MOSI PUSH_PULL P00
+   7   1              P0M1|=0x02; P0M2&=0xFD;   //MISO INPUT     P01
+   8   1              P1M1&=0xFE; P1M2|=0x01;   //SCLK PUSH_PULL P10
+   9   1          
+  10   1          SPSR |= (1 << 3); //DISMODF SS - GPIO
+  11   1              //SSOE - SPIEN - LSBFE - MSTR - CHPOL - CHPA - SPR1 - SPR0
+  12   1          SFRS = 0x00;
+  13   1              SPCR = (1 << 4);  
+  14   1          SPCR |= (1 << 6); 
+  15   1      }
+  16          
+  17          void spi_deinit(void)
+  18          {
+  19   1          SPCR &= ~(1 << 6); 
+  20   1      }
+  21          
+  22          void spi_setSpeed(char speed)
+  23          {
+  24   1              SPCR &= ~0x03;
+  25   1              SPCR |= (speed & 0x03);
+  26   1      }
+  27          
+  28          
+  29          char SPI_transfer(char dat)
+  30          {  
+  31   1              SPSR &= ~(1 << 7);
+  32   1              SPDR = dat;
+  33   1              while(!(SPSR & (1 << 7)));
+  34   1              return SPDR;    
+  35   1      }
+  36          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     57    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

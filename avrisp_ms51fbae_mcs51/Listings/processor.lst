@@ -1,0 +1,421 @@
+C51 COMPILER V9.60.0.0   PROCESSOR                                                         02/01/2023 14:42:54 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PROCESSOR
+OBJECT MODULE PLACED IN .\Objects\processor.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE src\processor.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\inc) DEBUG OBJECTEXTEN
+                    -D PRINT(.\Listings\processor.lst) OBJECT(.\Objects\processor.obj)
+
+line level    source
+
+   1          #include "processor.h"
+   2          #include "usart.h"
+   3          #include "spi.h"
+   4          //#include "i2c.h"
+   5          #include "delay.h"
+   6          #include "MS51_16K.h"
+   7          
+   8          
+   9          extern uint8_t rx_counter;
+  10          extern xdata uint8_t exchange[];
+  11          extern xdata uint8_t main_buff[];
+  12          extern uint8_t read_bsy; //Флаг готовности хоста 0 - готов, 1 - не готов
+  13          
+  14          unsigned long f_size;
+  15          uint16_t f_psize;
+  16          uint32_t ee_offset;
+  17          uint16_t block;
+  18          char f_type;
+  19          
+  20          
+  21          //Отправка ответа об ошибке
+  22          void send_errorFrame(void)
+  23          {
+  24   1      
+  25   1      }
+  26          
+  27          void send_successConn(void)
+  28          {
+  29   1              exchange[0] = 0xFE;
+  30   1              exchange[1] = 0x01;
+  31   1              exchange[2] = 0xCC;
+  32   1              exchange[3] = 0x00;
+  33   1              send_frame(exchange, 4);
+  34   1      }
+  35          
+  36          void send_frame(uint8_t *buff, uint8_t count)
+  37          {
+  38   1          int i;
+  39   1              for(i = 0; i < count; i++) USARTSend_char(buff[i]);
+  40   1      }
+  41          
+  42          //
+  43          void send_arr(uint8_t marker, uint8_t *buff, uint16_t count, uint16_t offset)
+  44          {
+  45   1          int p;
+  46   1              USARTSend_char(0xFE); //Start
+  47   1              USARTSend_char(count);
+  48   1              USARTSend_char(marker);
+  49   1              for(p = 0; p < count; p++) USARTSend_char(buff[p + offset]);
+  50   1      }
+  51          
+  52          void deassemble_frame(void)
+  53          {
+  54   1              switch(exchange[2])
+C51 COMPILER V9.60.0.0   PROCESSOR                                                         02/01/2023 14:42:54 PAGE 2   
+
+  55   1              {
+  56   2                      case 0xCC:
+  57   2                      {
+  58   3                              send_successConn();
+  59   3                              break;
+  60   3                      }
+  61   2      /*
+  62   2                      //Пакеты EEPROM
+  63   2                      case 0xE0://Чтение EEPROM
+  64   2                      {
+  65   2                              f_size = exchange[4] | (exchange[3]<<8);
+  66   2                              read_eeprom();
+  67   2                              break;
+  68   2                      }
+  69   2      
+  70   2                      case 0xE1://Подготовка к записи EEPROM
+  71   2                      {
+  72   2                              f_size = exchange[4] | (exchange[3]<<8);
+  73   2                              ee_offset = 0;
+  74   2      
+  75   2                              exchange[0] = 0xFE;
+  76   2                              exchange[1] = 0x01;
+  77   2                              exchange[2] = 0xE2;
+  78   2                              exchange[3] = 0x00;
+  79   2                              send_frame(exchange, 4);
+  80   2                              break;
+  81   2                      }
+  82   2      
+  83   2                      case 0xE2://Пакет для записи в EEPROM
+  84   2                      {
+  85   2                              write_eeprom();
+  86   2                              break;
+  87   2                      }
+  88   2      */
+  89   2                      //*************************SPI FLASH************************
+  90   2                      case 0xF0:
+  91   2                      {
+  92   3                              uint8_t temp_reg1 = 0, temp_reg2 = 0, temp_reg3 = 0;
+  93   3      
+  94   3                              FLCS_LOW
+  95   3                              spi1_read(0x9F, 0);
+  96   3                              temp_reg3 = spi1_read(0x00, 0);
+  97   3                              temp_reg1 = spi1_read(0x00, 0);
+  98   3                              temp_reg2 = spi1_read(0x00, 0);
+  99   3                              FLCS_HIGH
+ 100   3      
+ 101   3                              exchange[0] = 0xFE;
+ 102   3                              exchange[1] = 0x03;
+ 103   3                              exchange[2] = 0xF0;
+ 104   3                              exchange[3] = temp_reg1;
+ 105   3                              exchange[4] = temp_reg2;
+ 106   3                              exchange[5] = temp_reg3;
+ 107   3                              send_frame(exchange, 6);
+ 108   3      
+ 109   3                              break;
+ 110   3                      }
+ 111   2                      case 0xF1:
+ 112   2                      {
+ 113   3                              uint8_t temp_reg1 = 0, temp_reg2 = 0;
+ 114   3      
+ 115   3                              FLCS_LOW
+ 116   3                              spi1_read(0x05, 0);
+C51 COMPILER V9.60.0.0   PROCESSOR                                                         02/01/2023 14:42:54 PAGE 3   
+
+ 117   3                              temp_reg1 = spi1_read(0x00, 0);
+ 118   3                              FLCS_HIGH
+ 119   3      
+ 120   3                              FLCS_LOW
+ 121   3                              spi1_read(0x35, 0);
+ 122   3                              temp_reg2 = spi1_read(0x00, 0);
+ 123   3                              FLCS_HIGH
+ 124   3      
+ 125   3                              exchange[0] = 0xFE;
+ 126   3                              exchange[1] = 0x02;
+ 127   3                              exchange[2] = 0xF1;
+ 128   3                              exchange[3] = temp_reg1;
+ 129   3                              exchange[4] = temp_reg2;
+ 130   3                              send_frame(exchange, 5);
+ 131   3      
+ 132   3                              break;
+ 133   3                      }
+ 134   2                      case 0xF2:
+ 135   2                      {
+ 136   3                  unsigned long tmp_add;
+ 137   3                              //[32:24]
+ 138   3                              f_size = (exchange[3] << 8);
+ 139   3                              f_size = f_size << 8;
+ 140   3                              f_size = f_size << 8;
+ 141   3                              //[23:16]
+ 142   3                              tmp_add = (exchange[4] << 8);
+ 143   3                              tmp_add = tmp_add << 8;
+ 144   3                              f_size |= tmp_add;
+ 145   3                              //[15:0]
+ 146   3                              f_size |= (exchange[5] << 8) | exchange[6];
+ 147   3                              read_flash();
+ 148   3                              break;
+ 149   3                      }
+ 150   2      
+ 151   2                      case 0xF3:
+ 152   2                      {
+ 153   3                              uint8_t hSreg = exchange[3];
+ 154   3                              uint8_t lSreg = exchange[4];
+ 155   3      
+ 156   3                              FLCS_LOW
+ 157   3                              spi1_read(0x50, 0);
+ 158   3                              FLCS_HIGH
+ 159   3      
+ 160   3                              while(!(read_sreg1() & (1 << 1)));
+ 161   3      
+ 162   3                              FLCS_LOW
+ 163   3                              spi1_read(0x01, 0);
+ 164   3                              spi1_read(lSreg, 0);
+ 165   3                              spi1_read(hSreg, 0);
+ 166   3                              FLCS_HIGH
+ 167   3      
+ 168   3                              FLCS_LOW
+ 169   3                              spi1_read(0x04, 0);
+ 170   3                              FLCS_HIGH
+ 171   3      
+ 172   3                              exchange[0] = 0xFE;
+ 173   3                              exchange[1] = 0x01;
+ 174   3                              exchange[2] = 0xF3;
+ 175   3                              exchange[3] = 0x00;
+ 176   3                              send_frame(exchange, 4);
+ 177   3      
+ 178   3                              break;
+C51 COMPILER V9.60.0.0   PROCESSOR                                                         02/01/2023 14:42:54 PAGE 4   
+
+ 179   3                      }
+ 180   2                      case 0xF4:
+ 181   2                      {
+ 182   3                              FLCS_LOW
+ 183   3                              spi1_read(0x06, 0); //Write enable
+ 184   3                              FLCS_HIGH
+ 185   3      
+ 186   3                              while(!(read_sreg1() & (1 << 1)));
+ 187   3      
+ 188   3                              FLCS_LOW
+ 189   3                              spi1_read(0xC7, 0); //Erase
+ 190   3                              FLCS_HIGH
+ 191   3      
+ 192   3                              while(!(read_sreg1() & (1 << 1)));
+ 193   3      
+ 194   3                              exchange[0] = 0xFE;
+ 195   3                              exchange[1] = 0x01;
+ 196   3                              exchange[2] = 0xF4;
+ 197   3                              exchange[3] = 0x00;
+ 198   3                              send_frame(exchange, 4);
+ 199   3      
+ 200   3                              break;
+ 201   3                      }
+ 202   2                      case 0xF5:
+ 203   2                      {
+ 204   3                              f_psize = (exchange[3] << 8) | exchange[4];
+ 205   3                  f_type = exchange[5];
+ 206   3                              block = 0;
+ 207   3                              ee_offset = 0;
+ 208   3      
+ 209   3                              exchange[0] = 0xFE;
+ 210   3                              exchange[1] = 0x01;
+ 211   3                              exchange[2] = 0xF6;
+ 212   3                              exchange[3] = 0x00;
+ 213   3                              send_frame(exchange, 4);
+ 214   3                              break;
+ 215   3                      }
+ 216   2                      case 0xF6:
+ 217   2                      {
+ 218   3                              write_flash();
+ 219   3                              break;
+ 220   3                      }
+ 221   2      
+ 222   2                      default:
+ 223   2                      {
+ 224   3                              break;
+ 225   3                      }
+ 226   2              }
+ 227   1      }
+ 228          
+ 229          //**********************************I2C EEPROM*************************************
+ 230          /*
+ 231          void read_eeprom(void)
+ 232          {
+ 233              int i;
+ 234                  if(f_size == 128) //24c01, 24c02
+ 235                  {
+ 236                          eeprom_read_arr(0xA0, 1, 0, main_buff, f_size);
+ 237                          for(i = 0; i < f_size; i+= 128) send_arr(0xE0, main_buff, 128, i);
+ 238                  }
+ 239                  else if(f_size == 256) //24c01, 24c02
+ 240                  {
+C51 COMPILER V9.60.0.0   PROCESSOR                                                         02/01/2023 14:42:54 PAGE 5   
+
+ 241                          eeprom_read_arr(0xA0, 1, 0, main_buff, f_size);
+ 242                          for(i = 0; i < f_size; i+= 128)
+ 243                                  {
+ 244                                          send_arr(0xE0, main_buff, 128, i);
+ 245                                          while(exchange[2] != 0x3D);
+ 246                                          exchange[2] = 0x00;
+ 247                                  }
+ 248                  }
+ 249                  else if(f_size > 256 && f_size <= 2048) //24c04, 24c08, 24c16
+ 250                  {
+ 251                          for(i = 0; i < f_size; i+= 128)
+ 252                          {
+ 253                                  eeprom_read_arr((0xA0 | ((i >> 7) & 0x0E)), 1, i & 0xFF, main_buff, 128);
+ 254                                  send_arr(0xE0, main_buff, 128, 0);
+ 255                                  while(exchange[2] != 0x3D);
+ 256                                  exchange[2] = 0x00;
+ 257                          }
+ 258                  }
+ 259                  else
+ 260                  {
+ 261                          for(i = 0; i < f_size; i+= 128)
+ 262                          {
+ 263                                  eeprom_read_arr(0xA0, 2, i, main_buff, 128);
+ 264                                  send_arr(0xE0, main_buff, 128, 0);
+ 265                                  while(exchange[2] != 0x3D);
+ 266                                  exchange[2] = 0x00;
+ 267                          }
+ 268                  }
+ 269          }
+ 270          
+ 271          void write_eeprom(void)
+ 272          {
+ 273                  uint16_t offs = (exchange[3] << 8) | exchange[4];
+ 274              int k;
+ 275          
+ 276                  if(f_size <= 256) //24c01, 24c02 8-байтовая страница
+ 277                  {
+ 278                          for(k = 0; k < 32; k+= 8)
+ 279                          {
+ 280                                  eeprom_write_arr(0xA0, k + offs, 1, exchange, 8, k + 5);
+ 281                                  delay_ms(10);
+ 282                          }
+ 283                  }
+ 284                  else if(f_size > 256 && f_size <= 2048) // 16-байтовая страница
+ 285                  {
+ 286                          uint8_t dop_add;
+ 287          
+ 288                          for(k = 0; k < 32; k+= 16)
+ 289                          {
+ 290                                  dop_add = ((offs + k) >> 7) & 0x0E;
+ 291                                  eeprom_write_arr( (0xA0 | dop_add), ((k + offs) & 0xFF), 1, exchange, 16, k + 5);
+ 292                                  delay_ms(15);
+ 293                          }
+ 294                  }
+ 295                  else
+ 296                  {
+ 297                          eeprom_write_arr(0xA0, offs, 2, exchange, 32, 5);
+ 298                          delay_ms(25);
+ 299                  }
+ 300          
+ 301                  exchange[0] = 0xFE;
+ 302                  exchange[1] = 0x01;
+C51 COMPILER V9.60.0.0   PROCESSOR                                                         02/01/2023 14:42:54 PAGE 6   
+
+ 303                  exchange[2] = 0xE2;
+ 304                  exchange[3] = 0x00;
+ 305                  send_frame(exchange, 4);
+ 306          }
+ 307          */
+ 308          //*********************************SPI FLASH********************************
+ 309          //Читаем SREG1
+ 310          uint8_t read_sreg1(void)
+ 311          {
+ 312   1              uint8_t tmp;
+ 313   1              FLCS_LOW
+ 314   1              spi1_read(0x05, 0);
+ 315   1              tmp = spi1_read(0x00, 0);
+ 316   1              FLCS_HIGH
+ 317   1              return tmp;
+ 318   1      }
+ 319          
+ 320          void read_flash(void)
+ 321          {
+ 322   1          unsigned long i, k;
+ 323   1              FLCS_LOW
+ 324   1          if(f_size <= 0x1000000)
+ 325   1          {
+ 326   2              spi1_read(0x03, 0);
+ 327   2              spi1_read(0x00, 0);
+ 328   2              spi1_read(0x00, 0);
+ 329   2              spi1_read(0x00, 0);
+ 330   2          }
+ 331   1          else
+ 332   1          {
+ 333   2              spi1_read(0x13, 0);
+ 334   2              spi1_read(0x00, 0);
+ 335   2              spi1_read(0x00, 0);
+ 336   2              spi1_read(0x00, 0); 
+ 337   2              spi1_read(0x00, 0); 
+ 338   2          }
+ 339   1              for(i = 0; i < f_size; i += 128)
+ 340   1              {
+ 341   2                      for(k = 0; k < 128; k++) main_buff[k] = spi1_read(0x03, 0);
+ 342   2                      send_arr(0xF2, main_buff, 128, 0);
+ 343   2      
+ 344   2                      while(exchange[2] != 0x3D);
+ 345   2                      exchange[2] = 0x00;
+ 346   2              }
+ 347   1              FLCS_HIGH
+ 348   1      }
+ 349          
+ 350          void write_flash(void)
+ 351          {
+ 352   1              uint32_t tmp;
+ 353   1          int i,k;
+ 354   1      
+ 355   1              for(i = 0; i < exchange[1]; i++) main_buff[i + block] = exchange[i + 3];
+ 356   1              block += exchange[1];
+ 357   1              ee_offset += exchange[1];
+ 358   1              if(block == f_psize)
+ 359   1              {
+ 360   2                      tmp = ee_offset - f_psize; //Адрес блока для записи
+ 361   2      
+ 362   2                      FLCS_LOW
+ 363   2                      spi1_read(0x06, 0);
+ 364   2                      FLCS_HIGH
+C51 COMPILER V9.60.0.0   PROCESSOR                                                         02/01/2023 14:42:54 PAGE 7   
+
+ 365   2                      while(!(read_sreg1() & (1 << 1)));
+ 366   2      
+ 367   2                      FLCS_LOW
+ 368   2                      spi1_read(0x02, 0);
+ 369   2              if(f_type == 2) spi1_read((tmp >> 24), 0);
+ 370   2                      spi1_read(((tmp >> 16) & 0xFF), 0);
+ 371   2                      spi1_read(((tmp >> 8) & 0xFF), 0);
+ 372   2                      spi1_read((tmp & 0xFF), 0);
+ 373   2                      for(k = 0; k < f_psize; k++) spi1_read(main_buff[k], 0);
+ 374   2                      FLCS_HIGH
+ 375   2      
+ 376   2                      while((read_sreg1() & 0x01) == 0x01); //bit BSY
+ 377   2      
+ 378   2                      block = 0;
+ 379   2              }
+ 380   1              exchange[0] = 0xFE;
+ 381   1              exchange[1] = 0x01;
+ 382   1              exchange[2] = 0xF6;
+ 383   1              exchange[3] = 0x00;
+ 384   1              send_frame(exchange, 4);
+ 385   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1326    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13      34
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

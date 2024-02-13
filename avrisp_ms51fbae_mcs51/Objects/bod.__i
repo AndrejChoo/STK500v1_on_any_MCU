@@ -1,0 +1,1 @@
+"bod.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(..\ws51fbae_test) DEBUG OBJECTEXTEND PRINT(.\Listings\bod.lst) OBJECT(.\Objects\bod.obj)

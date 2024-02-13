@@ -1,0 +1,177 @@
+C51 COMPILER V9.60.0.0   IAP_SPROM                                                         01/31/2023 15:30:37 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE IAP_SPROM
+OBJECT MODULE PLACED IN .\Objects\IAP_SPROM.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE IAP_SPROM.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\ws51fbae_test) DEBUG OBJE
+                    -CTEXTEND PRINT(.\Listings\IAP_SPROM.lst) OBJECT(.\Objects\IAP_SPROM.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* SPDX-License-Identifier: Apache-2.0                                                                    
+             - */
+   4          /* Copyright(c) 2020 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   5          /*                                                                                                        
+             - */
+   6          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   7          
+   8          /*********************************************************************************************************
+             -***
+   9            Website: http://www.nuvoton.com
+  10            E-Mail : MicroC-8bit@nuvoton.com
+  11          **********************************************************************************************************
+             -**/
+  12          
+  13          #include "MS51_16K.h"
+  14          
+  15          unsigned char xdata IAPSPDataBuf[127];
+  16          
+  17          
+  18          
+  19          /**
+  20           * @brief       Erase LDROM
+  21           * @param       u16IAPStartAddress define LDROM area start address
+  22           * @param       u16IAPDataSize define LDROM need be erase bytes size
+  23           * @return      none
+  24           * @details     Page erase LDROM area base on data start address
+  25           * @example     Erase_LDROM(0x0000,2048);
+  26           */
+  27          void Erase_SPROM(void)
+  28          {
+  29   1      
+  30   1          set_CHPCON_IAPEN;                    // Disable IAP    set_CHPCON_IAPEN;                    // Enable 
+             -IAP function
+  31   1          set_IAPUEN_SPMEN;                    //  SPROM memory modify Enable
+  32   1          set_IAPUEN_SPUEN;                    //  SPROM modify enable
+  33   1          IAPFD = 0xFF;                        // IMPORTANT !! To erase function must setting IAPFD = 0xFF
+  34   1          IAPCN = PAGE_ERASE_SPROM;
+  35   1      
+  36   1          IAPAL = 0x80;
+  37   1          IAPAH = 0x01;
+  38   1          set_IAPTRG_IAPGO;
+  39   1      
+  40   1          clr_IAPUEN_SPUEN;                    //  SPROM modify disable
+  41   1          clr_CHPCON_IAPEN;                    // Disable IAP
+  42   1      }
+  43          
+  44          /**
+  45           * @brief       LDROM blank check
+C51 COMPILER V9.60.0.0   IAP_SPROM                                                         01/31/2023 15:30:37 PAGE 2   
+
+  46           * @param       u16IAPStartAddress define LDROM area start address
+  47           * @param       u16IAPDataSize define LDROM need be erase bytes size
+  48           * @return      none
+  49           * @details     Check each byte of LDROM is FFH or not.
+  50           * @example      LDROM_BlanckCheck(0x0000,2048);
+  51           */
+  52          void Erase_Verify_SPROM(unsigned int u16IAPDataSize)
+  53          {
+  54   1          unsigned int u16Count;
+  55   1          set_CHPCON_IAPEN;
+  56   1          set_IAPUEN_SPMEN;
+  57   1      
+  58   1          IAPAH = 0x01;
+  59   1          IAPAL = 0x80;
+  60   1      
+  61   1          IAPCN = BYTE_READ_SPROM;
+  62   1      
+  63   1          for (u16Count = 0; u16Count < u16IAPDataSize; u16Count++)
+  64   1          {
+  65   2              IAPFD = 0x00;
+  66   2              set_IAPTRG_IAPGO;
+  67   2      
+  68   2              if (IAPFD != 0xFF)
+  69   2                  break;
+  70   2      
+  71   2              IAPAL++;
+  72   2      
+  73   2          }
+  74   1      
+  75   1          clr_CHPCON_IAPEN;
+  76   1      }
+  77          
+  78          /**
+  79           * @brief       LDROM program loop
+  80           * @param       u16IAPStartAddress define LDROM area start address
+  81           * @param       u16IAPDataSize define LDROM need be erase bytes size
+  82           * @return      none
+  83           * @details     Copy IAPDataBuf to LDROM
+  84           * @example      LDROM_Program(0x0000,1024);
+  85           */
+  86          void Program_SPROM(unsigned int u16IAPDataSize)
+  87          {
+  88   1          unsigned int u16Count;
+  89   1      
+  90   1          set_CHPCON_IAPEN;
+  91   1          set_IAPUEN_SPMEN;                    //  SPROM memory modify Enable
+  92   1          set_IAPUEN_SPUEN;                    //  SPROM modify enable
+  93   1          IAPAH = 0x01;
+  94   1          IAPAL = 0x80;
+  95   1          IAPCN = BYTE_PROGRAM_SPROM;
+  96   1      
+  97   1          for (u16Count = 0; u16Count < u16IAPDataSize; u16Count++)
+  98   1          {
+  99   2              IAPFD = IAPSPDataBuf[u16Count];
+ 100   2              set_IAPTRG_IAPGO;
+ 101   2              IAPAL++;
+ 102   2          }
+ 103   1      
+ 104   1          clr_IAPUEN_SPUEN;                    //  SPROM modify disable
+ 105   1          clr_CHPCON_IAPEN;
+ 106   1      }
+ 107          
+C51 COMPILER V9.60.0.0   IAP_SPROM                                                         01/31/2023 15:30:37 PAGE 3   
+
+ 108          
+ 109          /**
+ 110           * @brief       LDROM check loop
+ 111           * @param       u16IAPStartAddress define LDROM area start address
+ 112           * @param       u16IAPDataSize define LDROM need be erase bytes size
+ 113           * @return      none
+ 114           * @details     Check with XRAM IAPDataBuf with LDROM
+ 115           * @example      LDROM_Program_Verify(0x0000,1024);
+ 116           */
+ 117          void Read_Verify_SPROM(unsigned int u16IAPDataSize)
+ 118          {
+ 119   1          unsigned int u16Count;
+ 120   1      
+ 121   1          set_CHPCON_IAPEN;
+ 122   1          set_IAPUEN_SPMEN;
+ 123   1      
+ 124   1          IAPAH = 0x01;
+ 125   1          IAPAL = 0x80;
+ 126   1          IAPCN = BYTE_READ_SPROM;
+ 127   1      
+ 128   1          for (u16Count = 0; u16Count < u16IAPDataSize; u16Count++)
+ 129   1          {
+ 130   2              IAPFD = 0x00;
+ 131   2              set_IAPTRG_IAPGO;
+ 132   2      
+ 133   2              if (IAPFD != IAPSPDataBuf[u16Count])
+ 134   2                  break;
+ 135   2      
+ 136   2              IAPAL++;
+ 137   2          }
+ 138   1      
+ 139   1          clr_CHPCON_IAPEN;
+ 140   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    519    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    127    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

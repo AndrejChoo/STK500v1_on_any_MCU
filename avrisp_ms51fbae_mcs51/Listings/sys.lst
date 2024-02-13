@@ -1,0 +1,94 @@
+C51 COMPILER V9.60.0.0   SYS                                                               02/09/2024 16:09:44 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SYS
+OBJECT MODULE PLACED IN .\Objects\sys.obj
+COMPILER INVOKED BY: D:\Programs\Keil_v5\C51\BIN\C51.EXE src\sys.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\inc) DEBUG OBJECTEX
+                    -TEND PRINT(.\Listings\sys.lst) OBJECT(.\Objects\sys.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* SPDX-License-Identifier: Apache-2.0                                                                    
+             - */
+   4          /* Copyright(c) 2020 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   5          /*                                                                                                        
+             - */
+   6          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   7          
+   8          //********************************************************************************************************
+             -***
+   9          //  Website: http://www.nuvoton.com
+  10          //  E-Mail : MicroC-8bit@nuvoton.com
+  11          //  Date   : Jan/21/2020
+  12          //********************************************************************************************************
+             -***
+  13          #include "MS51_16K.H"
+  14          #include "sys.h"
+  15          
+  16          unsigned char data  TA_REG_TMP,BYTE_TMP,SFRS_TMP,BIT_TMP;
+  17          
+  18            /**
+  19            * @brief This API configures modify system HIRC value
+  20            * @param[in] u8FsysMode . Valid values are:
+  21            *                       - \ref HIRC_24                 :Internal HIRC 24MHz .
+  22            *                       - \ref HIRC_16                 :Internal HIRC 16MHz.
+  23            * @note      None.
+  24            * @exmaple : MODIFY_HIRC(HIRC_24);
+  25            */
+  26           void MODIFY_HIRC(unsigned char u8HIRCSEL)
+  27          {
+  28   1          unsigned char data hircmap0,hircmap1, offset,judge;
+  29   1          unsigned char trimvalue16bit;
+  30   1      
+  31   1          BIT_TMP=EA; EA=0; TA=0xAA; TA=0x55; CHPCON|=0x01; EA=BIT_TMP;
+  32   1          SFRS = 0 ;
+  33   1          switch (u8HIRCSEL)
+  34   1          {
+  35   2            case HIRC_24:
+  36   2              IAPAL = 0x38;
+  37   2            break;
+  38   2            case HIRC_16:
+  39   2              IAPAL = 0x30;
+  40   2            break;
+  41   2          }
+  42   1          IAPAH = 0x00;
+  43   1          IAPCN = READ_UID;
+  44   1          BIT_TMP=EA;EA=0; TA=0xAA; TA=0x55; IAPTRG|=0x01; EA=BIT_TMP;
+  45   1          hircmap0 = IAPFD;
+  46   1          IAPAL++;
+C51 COMPILER V9.60.0.0   SYS                                                               02/09/2024 16:09:44 PAGE 2   
+
+  47   1          BIT_TMP=EA;EA=0; TA=0xAA; TA=0x55; IAPTRG|=0x01; EA=BIT_TMP;
+  48   1          hircmap1 = IAPFD;
+  49   1      
+  50   1          TA = 0xAA;
+  51   1          TA = 0x55;
+  52   1          RCTRIM0 = hircmap0;
+  53   1          TA = 0xAA;
+  54   1          TA = 0x55;
+  55   1          RCTRIM1 = hircmap1;
+  56   1          BIT_TMP=EA;EA=0;TA=0xAA;TA=0x55;IAPTRG&=~0x01;EA=BIT_TMP;
+  57   1      }
+*** WARNING C280 IN LINE 28 OF src\sys.c: 'offset': unreferenced local variable
+*** WARNING C280 IN LINE 28 OF src\sys.c: 'judge': unreferenced local variable
+*** WARNING C280 IN LINE 29 OF src\sys.c: 'trimvalue16bit': unreferenced local variable
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    139    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  3 WARNING(S),  0 ERROR(S)

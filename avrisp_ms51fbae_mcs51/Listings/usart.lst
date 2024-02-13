@@ -1,0 +1,63 @@
+C51 COMPILER V9.60.0.0   USART                                                             02/13/2024 11:40:47 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE USART
+OBJECT MODULE PLACED IN .\Objects\usart.obj
+COMPILER INVOKED BY: D:\Programs\Keil_v5\C51\BIN\C51.EXE src\usart.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\inc) DEBUG OBJECT
+                    -EXTEND PRINT(.\Listings\usart.lst) OBJECT(.\Objects\usart.obj)
+
+line level    source
+
+   1          #include "usart.h"
+   2          #include "MS51_16K.h"
+   3          
+   4          void usart_init(void)
+   5          {
+   6   1              P0M1&=0xBF; P0M2&=0xBF;    //Setting UART pin as Quasi mode for transmit
+   7   1              P0M1|=0x80; P0M2&=0x7F;   //Setting UART pin as input mode for recieve    
+   8   1              
+   9   1          SCON = 0x50; //UART0 Mode1,REN=1,TI=1
+  10   1          PCON |= 0x80; //UART0 Double Rate Enable
+  11   1          T3CON &= 0xF8; //(Prescale=1)
+  12   1          T3CON |= 0x20; //UART0 baud rate clock source = Timer3
+  13   1          RH3 = 0xFF;
+  14   1          RL3 = 0xF3;   //115200 on 24MHz
+  15   1          T3CON|= 0x08; //Trigger Timer3
+  16   1          
+  17   1          IE |= (1 << 4);
+  18   1      }
+  19          
+  20          
+  21          void uart_sendChar(char ch)
+  22          {
+  23   1              TI = 0;
+  24   1              SBUF = ch;
+  25   1              while(TI == 0);
+  26   1      }
+  27          
+  28          
+  29          void uart_sendString(char *str)
+  30          {
+  31   1              int i = 0;
+  32   1              while(str[i] != '\0')
+  33   1              {
+  34   2                      TI = 0;
+  35   2                      SBUF = str[i];
+  36   2                      while(TI == 0);
+  37   2                      i++;
+  38   2              }
+  39   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     84    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

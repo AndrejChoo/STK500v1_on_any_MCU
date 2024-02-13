@@ -1,0 +1,665 @@
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PROGRAMMER
+OBJECT MODULE PLACED IN .\Objects\programmer.obj
+COMPILER INVOKED BY: D:\Programs\Keil_v5\C51\BIN\C51.EXE src\programmer.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\inc) DEBUG O
+                    -BJECTEXTEND PRINT(.\Listings\programmer.lst) OBJECT(.\Objects\programmer.obj)
+
+line level    source
+
+   1          #include "MS51_16K.h"
+   2          #include "usart.h"
+   3          #include "spi.h"
+   4          #include "programmer.h"
+   5          #include "delay.h"
+   6          
+   7          
+   8          
+   9          #define PROG_FLICKER    1
+  10          #define PTIME 30
+  11          #define EECHUNK (32)
+  12          
+  13          typedef xdata struct param {
+  14            unsigned char devicecode;
+  15            unsigned char revision;
+  16            unsigned char progtype;
+  17            unsigned char parmode;
+  18            unsigned char polling;
+  19            unsigned char selftimed;
+  20            unsigned char lockbytes;
+  21            unsigned char fusebytes;
+  22            unsigned char flashpoll;
+  23            unsigned int eeprompoll;
+  24            unsigned int pagesize;
+  25            unsigned int eepromsize;
+  26            unsigned long flashsize;
+  27          }
+  28          parameter;
+  29          
+  30          parameter param;
+  31          
+  32          xdata int error = 0;
+  33          xdata int pmode = 0;
+  34          // address for reading and writing, set by 'U' command
+  35          xdata unsigned int here;
+  36          
+  37          extern xdata volatile unsigned char exchange[];
+  38          extern xdata unsigned char rx_rd_index0;
+  39          extern xdata volatile unsigned char rx_wr_index0;
+  40          
+  41          xdata unsigned char buff[256]; // global block storage
+  42          
+  43          static xdata unsigned char rst_active_high;
+  44          
+  45          
+  46          void setup(void)
+  47          {
+  48   1              usart_init();
+  49   1          
+  50   1          spi_setSpeed(3);
+  51   1      
+  52   1              //P2M0 |= 0x1c; P2M1 &= ~0x1c; //
+  53   1              pulse(LED_PMODE, 2);
+  54   1              pulse(LED_ERR, 2);
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 2   
+
+  55   1              pulse(LED_HB, 2);
+  56   1      
+  57   1      }
+  58          
+  59          void pulse(int pin, int tmes)
+  60          {
+  61   1              do
+  62   1              {
+  63   2                      if(pin == LED_PMODE)
+  64   2                              {
+  65   3                                      LED_PMODE_PORT |= (1 << LED_PMODE_PIN);
+  66   3                                      _delay_ms(30);
+  67   3                                      LED_PMODE_PORT &= ~(1 << LED_PMODE_PIN);
+  68   3                                      _delay_ms(30);
+  69   3                              }
+  70   2                      if(pin == LED_ERR)
+  71   2                              {
+  72   3                                      LED_ERR_PORT |= (1 << LED_ERR_PIN);
+  73   3                                      _delay_ms(30);
+  74   3                                      LED_ERR_PORT &= ~(1 << LED_ERR_PIN);
+  75   3                                      _delay_ms(30);
+  76   3                              }
+  77   2                      if(pin == LED_HB)
+  78   2                              {
+  79   3                                      LED_HB_PORT |= (1 << LED_HB_PIN);
+  80   3                                      _delay_ms(30);
+  81   3                                      LED_HB_PORT &= ~(1 << LED_HB_PIN);
+  82   3                                      _delay_ms(30);
+  83   3                              }
+  84   2              }
+  85   1              while(tmes--);
+  86   1      }
+  87          
+  88          void reset_target(unsigned char reset)
+  89          {
+  90   1              if((reset && rst_active_high) || (!reset && !rst_active_high)) RESET_HIGH
+  91   1              else RESET_LOW
+  92   1      }
+  93          
+  94          unsigned char Serial_available(void)
+  95          {
+  96   1              if(rx_wr_index0 != rx_rd_index0) return 1;
+  97   1              return 0;
+  98   1      }
+  99          
+ 100          unsigned char getch(void)
+ 101          {
+ 102   1              unsigned char temp;
+ 103   1              while(!(Serial_available()));
+ 104   1              temp = exchange[rx_rd_index0++];
+ 105   1              return(temp);
+ 106   1      }
+ 107          
+ 108          void fill(int n)
+ 109          {
+ 110   1          int x;
+ 111   1          for (x = 0; x < n; x++) buff[x] = getch();
+ 112   1      }
+ 113          
+ 114          void prog_lamp(int state)
+ 115          {
+ 116   1              if (PROG_FLICKER)
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 3   
+
+ 117   1              {
+ 118   2                      if(state) LED_PMODE_HIGH
+ 119   2                      else LED_PMODE_LOW
+ 120   2              }
+ 121   1      }
+ 122          
+ 123          unsigned char spi_transaction(unsigned char a, unsigned char b, unsigned char c, unsigned char d)
+ 124          {
+ 125   1        SPI_transfer(a);
+ 126   1        SPI_transfer(b);
+ 127   1        SPI_transfer(c);
+ 128   1        return SPI_transfer(d);
+ 129   1      }
+ 130          
+ 131          void empty_reply(void)
+ 132          {
+ 133   1          unsigned char rp = getch();
+ 134   1          if (rp == CRC_EOP)
+ 135   1          {
+ 136   2              uart_sendChar(STK_INSYNC);
+ 137   2              uart_sendChar(STK_OK);
+ 138   2          }
+ 139   1          else
+ 140   1          {
+ 141   2              error++;
+ 142   2              uart_sendChar(STK_NOSYNC);
+ 143   2          }
+ 144   1      }
+ 145          
+ 146          void breply(unsigned char b)
+ 147          {
+ 148   1          unsigned char rp = getch();
+ 149   1          if (rp == CRC_EOP)
+ 150   1          {
+ 151   2              uart_sendChar(STK_INSYNC);
+ 152   2              uart_sendChar(b);
+ 153   2              uart_sendChar(STK_OK);
+ 154   2          }
+ 155   1          else
+ 156   1          {
+ 157   2              error++;
+ 158   2              uart_sendChar(STK_NOSYNC);
+ 159   2          }
+ 160   1      }
+ 161          
+ 162          void get_version(unsigned char c)
+ 163          {
+ 164   1        switch (c) {
+ 165   2          case 0x80:
+ 166   2            breply(HWVER);
+ 167   2            break;
+ 168   2          case 0x81:
+ 169   2            breply(SWMAJ);
+ 170   2            break;
+ 171   2          case 0x82:
+ 172   2            breply(SWMIN);
+ 173   2            break;
+ 174   2          case 0x93:
+ 175   2            breply('S'); // serial programmer
+ 176   2            break;
+ 177   2          default:
+ 178   2            breply(0);
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 4   
+
+ 179   2        }
+ 180   1      }
+ 181          
+ 182          void set_parameters() {
+ 183   1        // call this after reading parameter packet into buff[]
+ 184   1        param.devicecode = buff[0];
+ 185   1        param.revision   = buff[1];
+ 186   1        param.progtype   = buff[2];
+ 187   1        param.parmode    = buff[3];
+ 188   1        param.polling    = buff[4];
+ 189   1        param.selftimed  = buff[5];
+ 190   1        param.lockbytes  = buff[6];
+ 191   1        param.fusebytes  = buff[7];
+ 192   1        param.flashpoll  = buff[8];
+ 193   1        // ignore buff[9] (= buff[8])
+ 194   1        // following are 16 bits (big endian)
+ 195   1        param.eeprompoll = beget16(&buff[10]);
+ 196   1        param.pagesize   = beget16(&buff[12]);
+ 197   1        param.eepromsize = beget16(&buff[14]);
+ 198   1      
+ 199   1        // 32 bits flashsize (big endian)
+ 200   1        param.flashsize = (buff[16] << 24) | (buff[17] << 16) | (buff[18] << 8) | buff[19];
+ 201   1      
+ 202   1        // AVR devices have active low reset, AT89Sx are active high
+ 203   1        rst_active_high = (param.devicecode >= 0xe0);
+ 204   1      }
+ 205          
+ 206          void start_pmode() {
+ 207   1      
+ 208   1        // Reset target before driving PIN_SCK or PIN_MOSI
+ 209   1      
+ 210   1        // SPI.begin() will configure SS as output, so SPI master mode is selected.
+ 211   1        // We have defined RESET as pin 10, which for many Arduinos is not the SS pin.
+ 212   1        // So we have to configure RESET as output here,
+ 213   1        // (reset_target() first sets the correct level)
+ 214   1        reset_target(1);
+ 215   1            
+ 216   1          RESET_OUT
+ 217   1      
+ 218   1        spi_init();
+ 219   1        spi_setSpeed(3);
+ 220   1        // See AVR datasheets, chapter "SERIAL_PRG Programming Algorithm":
+ 221   1      
+ 222   1        // Pulse RESET after PIN_SCK is low:
+ 223   1        //digitalWrite(PIN_SCK, LOW);
+ 224   1        _delay_ms(20); // discharge PIN_SCK, value arbitrarily chosen
+ 225   1        reset_target(0);
+ 226   1        // Pulse must be minimum 2 target CPU clock cycles so 100 usec is ok for CPU
+ 227   1        // speeds above 20 KHz
+ 228   1        _delay_us(100);
+ 229   1        reset_target(1);
+ 230   1      
+ 231   1        // Send the enable programming command:
+ 232   1        _delay_ms(50); // datasheet: must be > 20 msec
+ 233   1        spi_transaction(0xAC, 0x53, 0x00, 0x00);
+ 234   1        pmode = 1;
+ 235   1      }
+ 236          
+ 237          void end_pmode() {
+ 238   1              spi_deinit();
+ 239   1              // We're about to take the target out of reset so configure SPI pins as input
+ 240   1              reset_target(1);
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 5   
+
+ 241   1                  
+ 242   1          RESET_IN
+ 243   1          
+ 244   1              pmode = 0;
+ 245   1          //Clear ring buffer
+ 246   1          //rx_wr_index0 = 0, rx_rd_index0 = 0;
+ 247   1      }
+ 248          
+ 249          void universal()
+ 250          {
+ 251   1        unsigned char ch;
+ 252   1      
+ 253   1        fill(4);
+ 254   1        ch = spi_transaction(buff[0], buff[1], buff[2], buff[3]);
+ 255   1        breply(ch);
+ 256   1      }
+ 257          
+ 258          void flash(unsigned char hilo, unsigned int addr, unsigned char dat)
+ 259          {
+ 260   1        spi_transaction((0x40 + 8 * hilo), ((addr >> 8) & 0xFF), (addr & 0xFF), dat);
+ 261   1      }
+ 262          
+ 263          void commit(unsigned int addr)
+ 264          {
+ 265   1        int i;
+ 266   1          
+ 267   1        if (PROG_FLICKER)
+ 268   1        {
+ 269   2          prog_lamp(0);
+ 270   2        }
+ 271   1        spi_transaction(0x4C, ((addr >> 8) & 0xFF), (addr & 0xFF), 0);
+ 272   1        if (PROG_FLICKER)
+ 273   1        {
+ 274   2          for(i=0; i<PTIME; i++) _delay_ms(1);
+ 275   2          prog_lamp(1);
+ 276   2        }
+ 277   1      }
+ 278          
+ 279          unsigned int current_page(void)
+ 280          {
+ 281   1        if (param.pagesize == 32)
+ 282   1        {
+ 283   2          return here & 0xFFFFFFF0;
+ 284   2        }
+ 285   1        if (param.pagesize == 64)
+ 286   1        {
+ 287   2          return here & 0xFFFFFFE0;
+ 288   2        }
+ 289   1        if (param.pagesize == 128)
+ 290   1        {
+ 291   2          return here & 0xFFFFFFC0;
+ 292   2        }
+ 293   1        if (param.pagesize == 256)
+ 294   1        {
+ 295   2          return here & 0xFFFFFF80;
+ 296   2        }
+ 297   1        return here;
+ 298   1      }
+ 299          
+ 300          void write_flash(int length)
+ 301          {
+ 302   1        fill(length);
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 6   
+
+ 303   1        if (CRC_EOP == getch())
+ 304   1        {
+ 305   2                uart_sendChar(STK_INSYNC);
+ 306   2                uart_sendChar(write_flash_pages(length));
+ 307   2        }
+ 308   1        else
+ 309   1        {
+ 310   2                error++;
+ 311   2                uart_sendChar(STK_NOSYNC);
+ 312   2        }
+ 313   1      }
+ 314          
+ 315          unsigned char write_flash_pages(int length)
+ 316          {
+ 317   1          int x = 0;
+ 318   1          unsigned int page; 
+ 319   1          
+ 320   1          page = current_page();
+ 321   1          while (x < length)
+ 322   1          {
+ 323   2              if (page != current_page())
+ 324   2              {
+ 325   3                  commit(page);
+ 326   3                  page = current_page();
+ 327   3              }
+ 328   2              flash(0, here, buff[x++]);
+ 329   2              flash(1, here, buff[x++]);
+ 330   2              here++;
+ 331   2          }
+ 332   1      
+ 333   1          commit(page);
+ 334   1      
+ 335   1          return STK_OK;
+ 336   1      }
+ 337          
+ 338          unsigned char write_eeprom(unsigned int length)
+ 339          {
+ 340   1        // here is a word address, get the byte address
+ 341   1        unsigned int start = here * 2;
+ 342   1        unsigned int remaining = length;
+ 343   1        if (length > param.eepromsize)
+ 344   1        {
+ 345   2          error++;
+ 346   2          return STK_FAILED;
+ 347   2        }
+ 348   1        while (remaining > EECHUNK)
+ 349   1        {
+ 350   2          write_eeprom_chunk(start, EECHUNK);
+ 351   2          start += EECHUNK;
+ 352   2          remaining -= EECHUNK;
+ 353   2        }
+ 354   1        write_eeprom_chunk(start, remaining);
+ 355   1        return STK_OK;
+ 356   1      }
+ 357          
+ 358          unsigned char write_eeprom_chunk(unsigned int start, unsigned int length)
+ 359          {
+ 360   1        // this writes byte-by-byte, page writing may be faster (4 bytes at a time)
+ 361   1        unsigned int x;
+ 362   1        fill(length);
+ 363   1        prog_lamp(0);
+ 364   1        for (x = 0; x < length; x++)
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 7   
+
+ 365   1        {
+ 366   2          unsigned int addr = start + x;
+ 367   2          spi_transaction(0xC0, (addr >> 8) & 0xFF, addr & 0xFF, buff[x]);
+ 368   2          _delay_us(45);
+ 369   2        }
+ 370   1        prog_lamp(1);
+ 371   1        return STK_OK;
+ 372   1      }
+ 373          
+ 374          void program_page()
+ 375          {
+ 376   1         char result; 
+ 377   1         unsigned int length;
+ 378   1         char memtype;
+ 379   1          
+ 380   1        result = STK_FAILED;
+ 381   1        length = 256 * getch();
+ 382   1        length += getch();
+ 383   1        memtype = getch();
+ 384   1        // flash memory @here, (length) bytes
+ 385   1        if (memtype == 'F')
+ 386   1        {
+ 387   2          write_flash(length);
+ 388   2          return;
+ 389   2        }
+ 390   1        if (memtype == 'E')
+ 391   1        {
+ 392   2          result = (char)write_eeprom(length);
+ 393   2          if (CRC_EOP == getch())
+ 394   2          {
+ 395   3              uart_sendChar(STK_INSYNC);
+ 396   3              uart_sendChar(result);
+ 397   3          }
+ 398   2          else
+ 399   2          {
+ 400   3            error++;
+ 401   3            uart_sendChar(STK_NOSYNC);
+ 402   3          }
+ 403   2          return;
+ 404   2        }
+ 405   1        uart_sendChar(STK_FAILED);
+ 406   1        return;
+ 407   1      }
+ 408          
+ 409          unsigned char flash_read(unsigned char hilo, unsigned int addr)
+ 410          {
+ 411   1        return spi_transaction((0x20 + hilo * 8), ((addr >> 8) & 0xFF), (addr & 0xFF), 0);
+ 412   1      }
+ 413          
+ 414          char flash_read_page(int length)
+ 415          {
+ 416   1          int x;
+ 417   1          unsigned char low;
+ 418   1          unsigned char high;
+ 419   1          
+ 420   1          for (x = 0; x < length; x += 2)
+ 421   1          {
+ 422   2              low = flash_read(0, here);
+ 423   2              uart_sendChar(low);
+ 424   2              high = flash_read(1, here);
+ 425   2              uart_sendChar(high);
+ 426   2              here++;
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 8   
+
+ 427   2          }
+ 428   1          return STK_OK;
+ 429   1      }
+ 430          
+ 431          char eeprom_read_page(int length)
+ 432          {
+ 433   1          // here again we have a word address
+ 434   1          int x;
+ 435   1          int start;
+ 436   1          int addr;
+ 437   1          unsigned char ee;
+ 438   1          
+ 439   1          start = here * 2;
+ 440   1          for (x = 0; x < length; x++)
+ 441   1          {
+ 442   2              addr = start + x;
+ 443   2              ee = spi_transaction(0xA0, (addr >> 8) & 0xFF, addr & 0xFF, 0xFF);
+ 444   2              uart_sendChar(ee);
+ 445   2          }
+ 446   1          return STK_OK;
+ 447   1      }
+ 448          
+ 449          void read_page()
+ 450          {
+ 451   1          char result;
+ 452   1          int length;
+ 453   1          char memtype;
+ 454   1          char temp;
+ 455   1          
+ 456   1          result = STK_FAILED;
+ 457   1          length = getch() << 8;
+ 458   1          length += getch();
+ 459   1          memtype = getch();
+ 460   1          
+ 461   1          temp = getch();
+ 462   1          if (temp != CRC_EOP )
+ 463   1          {
+ 464   2              error++;
+ 465   2              uart_sendChar(STK_NOSYNC);
+ 466   2              return;
+ 467   2          }
+ 468   1          else
+ 469   1          {
+ 470   2              uart_sendChar(STK_INSYNC);
+ 471   2              if (memtype == 'F') result = flash_read_page(length);
+ 472   2              if (memtype == 'E') result = eeprom_read_page(length);
+ 473   2              uart_sendChar(result);
+ 474   2          }
+ 475   1      }
+ 476          
+ 477          void read_signature(void)
+ 478          {
+ 479   1          unsigned char high;
+ 480   1          unsigned char middle;
+ 481   1          unsigned char low;
+ 482   1          
+ 483   1        if (CRC_EOP != getch())
+ 484   1        {
+ 485   2          error++;
+ 486   2          uart_sendChar(STK_NOSYNC);
+ 487   2          return;
+ 488   2        }
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 9   
+
+ 489   1        uart_sendChar(STK_INSYNC);
+ 490   1        high = spi_transaction(0x30, 0x00, 0x00, 0x00);
+ 491   1        uart_sendChar(high);
+ 492   1        middle = spi_transaction(0x30, 0x00, 0x01, 0x00);
+ 493   1        uart_sendChar(middle);
+ 494   1        low = spi_transaction(0x30, 0x00, 0x02, 0x00);
+ 495   1        uart_sendChar(low);
+ 496   1        uart_sendChar(STK_OK);
+ 497   1      }
+ 498          
+ 499          
+ 500          
+ 501          void avrisp(void)
+ 502          {
+ 503   1        unsigned char ch;
+ 504   1      
+ 505   1        ch = getch();
+ 506   1          
+ 507   1        switch (ch)
+ 508   1        {
+ 509   2          case '0': // signon
+ 510   2          {
+ 511   3            error = 0;
+ 512   3            empty_reply();
+ 513   3            break;
+ 514   3          }
+ 515   2          case '1':
+ 516   2          {
+ 517   3            if (getch() == CRC_EOP)
+ 518   3            {
+ 519   4                uart_sendChar(STK_INSYNC);
+ 520   4                uart_sendString("AVR ISP");
+ 521   4                uart_sendChar(STK_OK);
+ 522   4            }
+ 523   3            else
+ 524   3            {
+ 525   4              error++;
+ 526   4              uart_sendChar(STK_NOSYNC);
+ 527   4            }
+ 528   3            break;
+ 529   3          }
+ 530   2          case 'A':
+ 531   2          {
+ 532   3            get_version(getch());
+ 533   3            break;
+ 534   3          }
+ 535   2          case 'B':
+ 536   2          {
+ 537   3            fill(20);
+ 538   3            set_parameters();
+ 539   3            empty_reply();
+ 540   3            break;
+ 541   3          }
+ 542   2          case 'E': // extended parameters - ignore for now
+ 543   2          {
+ 544   3            fill(5);
+ 545   3            empty_reply();
+ 546   3            break;
+ 547   3          }
+ 548   2          case 'P':
+ 549   2          {
+ 550   3            if (!pmode) start_pmode();
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 10  
+
+ 551   3            empty_reply();
+ 552   3            break;
+ 553   3          }
+ 554   2          case 'U': // set address (word)
+ 555   2          {
+ 556   3            here = getch();
+ 557   3            here += getch() << 8;
+ 558   3            empty_reply();
+ 559   3            break;
+ 560   3          }
+ 561   2          case 0x60: //STK_PROG_FLASH
+ 562   2          {
+ 563   3            getch(); // low addr
+ 564   3            getch(); // high addr
+ 565   3            empty_reply();
+ 566   3            break;
+ 567   3          }
+ 568   2          case 0x61: //STK_PROG_DATA
+ 569   2          {
+ 570   3            getch(); // data
+ 571   3            empty_reply();
+ 572   3            break;
+ 573   3          }
+ 574   2          case 0x64: //STK_PROG_PAGE
+ 575   2          {
+ 576   3            program_page();
+ 577   3            break;
+ 578   3          }
+ 579   2          case 0x74: //STK_READ_PAGE 't'
+ 580   2          {
+ 581   3            read_page();
+ 582   3            break;
+ 583   3          }
+ 584   2          case 'V': //0x56
+ 585   2          {
+ 586   3            universal();
+ 587   3            break;
+ 588   3          }
+ 589   2          case 'Q': //0x51
+ 590   2          {
+ 591   3            error = 0;
+ 592   3            end_pmode();
+ 593   3            empty_reply();
+ 594   3            break;
+ 595   3          }
+ 596   2          case 0x75: //STK_READ_SIGN 'u'
+ 597   2          {
+ 598   3            read_signature();
+ 599   3            break;
+ 600   3          }
+ 601   2          // expecting a command, not CRC_EOP
+ 602   2          // this is how we can get back in sync
+ 603   2          case CRC_EOP:
+ 604   2          {
+ 605   3            error++;
+ 606   3            uart_sendChar(STK_NOSYNC);
+ 607   3            break;
+ 608   3          }
+ 609   2          // anything else we will return STK_UNKNOWN
+ 610   2          default:
+ 611   2          {
+ 612   3            error++;
+C51 COMPILER V9.60.0.0   PROGRAMMER                                                        02/13/2024 11:34:09 PAGE 11  
+
+ 613   3            if (CRC_EOP == getch()) uart_sendChar(STK_UNKNOWN);
+ 614   3            else uart_sendChar(STK_NOSYNC);
+ 615   3            break;
+ 616   3          }
+ 617   2        }
+ 618   1      }
+ 619          
+ 620          
+ 621          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2092    ----
+   CONSTANT SIZE    =      8    ----
+   XDATA SIZE       =    282    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      56
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

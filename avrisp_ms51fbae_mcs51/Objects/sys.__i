@@ -1,0 +1,1 @@
+"src\sys.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(.\inc) DEBUG OBJECTEXTEND PRINT(.\Listings\sys.lst) OBJECT(.\Objects\sys.obj)

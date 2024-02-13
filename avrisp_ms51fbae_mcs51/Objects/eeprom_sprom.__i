@@ -1,0 +1,1 @@
+"eeprom_sprom.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(..\ws51fbae_test) DEBUG OBJECTEXTEND PRINT(.\Listings\eeprom_sprom.lst) OBJECT(.\Objects\eeprom_sprom.obj)

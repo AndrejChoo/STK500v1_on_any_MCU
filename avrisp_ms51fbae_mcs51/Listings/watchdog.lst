@@ -1,0 +1,126 @@
+C51 COMPILER V9.60.0.0   WATCHDOG                                                          01/31/2023 15:30:38 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE WATCHDOG
+OBJECT MODULE PLACED IN .\Objects\watchdog.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE watchdog.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\ws51fbae_test) DEBUG OBJEC
+                    -TEXTEND PRINT(.\Listings\watchdog.lst) OBJECT(.\Objects\watchdog.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* SPDX-License-Identifier: Apache-2.0                                                                    
+             - */
+   4          /* Copyright(c) 2020 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   5          /*                                                                                                        
+             - */
+   6          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   7          
+   8          //********************************************************************************************************
+             -***
+   9          //  Website: http://www.nuvoton.com
+  10          //  E-Mail : MicroC-8bit@nuvoton.com
+  11          //********************************************************************************************************
+             -***
+  12          #include "MS51_16K.H"
+  13          
+  14          void Enable_WDT_Reset_Config(void)
+  15          {
+  16   1          set_CHPCON_IAPEN;
+  17   1          IAPAL = 0x04;
+  18   1          IAPAH = 0x00;
+  19   1          IAPFD = 0x0F;
+  20   1          IAPCN = BYTE_PROGRAM_CONFIG;
+  21   1          set_IAPUEN_CFUEN;
+  22   1          set_IAPTRG_IAPGO;                                  //trigger IAP
+  23   1          while((CHPCON&SET_BIT6)==SET_BIT6);          //check IAPFF (CHPCON.6)
+  24   1          clr_IAPUEN_CFUEN;
+  25   1          clr_CHPCON_IAPEN;
+  26   1          set_CHPCON_SWRST;
+  27   1      }
+  28          
+  29          /****************************************************************************/
+  30          /* WDT CONFIG disable                                                       */
+  31          /* warning : this macro is for CONFIG already enable WDT Reset to disable.  */
+  32          /* Since erase CONFIG is full page                                          */
+  33          /* step 1. storage CONFIG value in RAM                                      */
+  34          /* step 2. modify RAM CONFIG4 WDT value to disable                          */
+  35          /* step 3. erase CONFIG page                                                */
+  36          /* step 4. re writer CONFIG.                                                */
+  37          /* **************************************************************************/
+  38          void Disable_WDT_Reset_Config(void)
+  39          {
+  40   1        UINT8 cf0,cf1,cf2,cf3,cf4;
+  41   1        
+  42   1          set_CHPCON_IAPEN;
+  43   1          IAPAL = 0x00;
+  44   1          IAPAH = 0x00;
+  45   1          IAPCN = BYTE_READ_CONFIG;
+  46   1          set_IAPTRG_IAPGO;                                  //Storage CONFIG0 data
+C51 COMPILER V9.60.0.0   WATCHDOG                                                          01/31/2023 15:30:38 PAGE 2   
+
+  47   1          cf0 = IAPFD;
+  48   1          IAPAL = 0x01;
+  49   1          set_IAPTRG_IAPGO;                                  //Storage CONFIG1 data
+  50   1          cf1 = IAPFD;
+  51   1          IAPAL = 0x02;
+  52   1          set_IAPTRG_IAPGO;                                  //Storage CONFIG2 data
+  53   1          cf2 = IAPFD;
+  54   1          IAPAL = 0x03;
+  55   1          set_IAPTRG_IAPGO;                                  //Storage CONFIG3 data
+  56   1          cf3 = IAPFD;
+  57   1          IAPAL = 0x04;
+  58   1          set_IAPTRG_IAPGO;                                  //Storage CONFIG4 data
+  59   1          cf4 = IAPFD;
+  60   1          cf4 |= 0xF0;                                      //Moidfy Storage CONFIG4 data disable WDT reset
+  61   1          
+  62   1          set_IAPUEN_CFUEN;  
+  63   1          IAPCN = PAGE_ERASE_CONFIG;                        //Erase CONFIG all
+  64   1          IAPAH = 0x00;
+  65   1          IAPAL = 0x00;
+  66   1          IAPFD = 0xFF;
+  67   1          set_IAPTRG_IAPGO;
+  68   1          
+  69   1          IAPCN = BYTE_PROGRAM_CONFIG;                    //Write CONFIG
+  70   1          IAPFD = cf0;
+  71   1          set_IAPTRG_IAPGO;
+  72   1          IAPAL = 0x01;
+  73   1          IAPFD = cf1;
+  74   1          set_IAPTRG_IAPGO;
+  75   1          IAPAL = 0x02;
+  76   1          IAPFD = cf2;
+  77   1          set_IAPTRG_IAPGO;
+  78   1          IAPAL = 0x03;
+  79   1          IAPFD = cf3;
+  80   1          set_IAPTRG_IAPGO;
+  81   1          IAPAL = 0x04;
+  82   1          IAPFD = cf4;
+  83   1          set_IAPTRG_IAPGO;
+  84   1      
+  85   1          set_IAPUEN_CFUEN;
+  86   1          clr_CHPCON_IAPEN;
+  87   1          if (WDCON&SET_BIT3)
+  88   1          {
+  89   2            clr_WDCON_WDTRF;
+  90   2            set_CHPCON_SWRST;
+  91   2          }
+  92   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    532    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

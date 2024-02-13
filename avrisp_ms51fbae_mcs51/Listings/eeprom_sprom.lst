@@ -1,0 +1,193 @@
+C51 COMPILER V9.60.0.0   EEPROM_SPROM                                                      01/31/2023 15:30:37 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE EEPROM_SPROM
+OBJECT MODULE PLACED IN .\Objects\eeprom_sprom.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE eeprom_sprom.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\ws51fbae_test) DEBUG O
+                    -BJECTEXTEND PRINT(.\Listings\eeprom_sprom.lst) OBJECT(.\Objects\eeprom_sprom.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* SPDX-License-Identifier: Apache-2.0                                                                    
+             - */
+   4          /* Copyright(c) 2020 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   5          /*                                                                                                        
+             - */
+   6          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   7          
+   8          //********************************************************************************************************
+             -***
+   9          //  Website: http://www.nuvoton.com
+  10          //  E-Mail : MicroC-8bit@nuvoton.com
+  11          //********************************************************************************************************
+             -***
+  12          #include "MS51_16K.h"
+  13          
+  14          //volatile unsigned char xdata page_buffer[127];
+  15          
+  16          /**
+  17           * @brief       Read Dataflash
+  18           * @param       Dataflash start address
+  19           * @return      Dataflash Value
+  20           * @details     None
+  21           */
+  22           unsigned char Read_SPROM_BYTE(unsigned char code *u8_addr)
+  23          {
+  24   1          unsigned char rdata;
+  25   1          set_IAPUEN_SPMEN;
+  26   1          rdata = *(0xFF80+u8_addr);
+  27   1          return rdata;
+  28   1      }
+  29          
+  30          //-------------------------------------------------------------------------
+  31          void Write_SPROM_DATAFLASH_ARRAY(unsigned int u16_addr, unsigned char *pDat, unsigned int num)
+  32          {
+  33   1          unsigned char CPageAddr, EPageAddr, cnt;
+  34   1          CPageAddr = u16_addr >> 7;
+  35   1          EPageAddr = (u16_addr + num) >> 7;
+  36   1      
+  37   1          while (CPageAddr != EPageAddr)
+  38   1          {
+  39   2              cnt = WriteDataToSPOnePage(u16_addr+0xFF80, pDat, 127);
+  40   2              u16_addr += cnt;
+  41   2              pDat += cnt;
+  42   2              num -= cnt;
+  43   2              CPageAddr = u16_addr >> 7;
+  44   2          }
+  45   1      
+  46   1          if (num)
+C51 COMPILER V9.60.0.0   EEPROM_SPROM                                                      01/31/2023 15:30:37 PAGE 2   
+
+  47   1          {
+  48   2              WriteDataToSPOnePage(u16_addr, pDat, num);
+  49   2          }
+  50   1      }
+  51          //-------------------------------------------------------------------------
+  52          void Read_SPROM_DATAFLASH_ARRAY(unsigned int u16_addr, unsigned char *pDat, unsigned int num)
+  53          {
+  54   1          unsigned int i;
+  55   1      
+  56   1          set_IAPUEN_SPMEN;
+  57   1          for (i = 0; i < num; i++)
+  58   1              pDat[i] = *(unsigned char code *)(u16_addr+0xFF80 + i);
+  59   1      }
+  60          
+  61          //--------------------------------------------------------------------------------------------------------
+             ----
+  62          unsigned char WriteDataToSPOnePage(unsigned int u16_addr, const unsigned char *pDat, unsigned char num)
+  63          {
+  64   1          unsigned char i, offset;
+  65   1          unsigned char code *pCode;
+  66   1          unsigned char xdata xd_tmp[127];
+  67   1      
+  68   1          set_CHPCON_IAPEN;
+  69   1          set_IAPUEN_SPMEN;
+  70   1          set_IAPUEN_SPUEN;
+  71   1      
+  72   1          offset = u16_addr & 0x007F;
+  73   1          i = PAGE_SIZE - offset;
+  74   1      
+  75   1          if (num > i)num = i;
+  76   1      
+  77   1          pCode = (unsigned char code *)(0xFFFF);
+  78   1          if (pCode == 0)
+  79   1          {
+  80   2                  IAPAL = 0x80;
+  81   2                  IAPAH = 0x01;
+  82   2                  IAPCN = PAGE_ERASE_SPROM;
+  83   2                  IAPFD = 0xFF;
+  84   2                  set_IAPTRG_IAPGO;
+  85   2          }
+  86   1          
+  87   1          pCode = (unsigned char code *)(u16_addr+0xFF80);
+  88   1            for (i = 0; i < num; i++)
+  89   1          {
+  90   2              if (pCode[i] != 0xFF)break;
+  91   2          }
+  92   1      
+  93   1          if (i == num)
+  94   1          {
+  95   2              IAPCN = BYTE_PROGRAM_SPROM;
+  96   2              IAPAL = u16_addr+0x80;
+  97   2              IAPAH = 0x01;
+  98   2      
+  99   2              for (i = 0; i < num; i++)
+ 100   2              {
+ 101   3                  IAPFD = pDat[i];
+ 102   3                  set_IAPTRG_IAPGO;
+ 103   3                  IAPAL++;
+ 104   3              }
+ 105   2      
+ 106   2              for (i = 0; i < num; i++)
+ 107   2              {
+C51 COMPILER V9.60.0.0   EEPROM_SPROM                                                      01/31/2023 15:30:37 PAGE 3   
+
+ 108   3                  if (pCode[i] != pDat[i])break;
+ 109   3              }
+ 110   2      
+ 111   2              if (i != num) goto WriteDataToPage20;
+ 112   2          }
+ 113   1          else
+ 114   1          {
+ 115   2      WriteDataToPage20:
+ 116   2              pCode = (unsigned char code *)(0xFF80);
+ 117   2      
+ 118   2              for (i = 0; i < 128; i++)
+ 119   2              {
+ 120   3                  xd_tmp[i] = pCode[i];
+ 121   3              }
+ 122   2      
+ 123   2              for (i = 0; i < num; i++)
+ 124   2              {
+ 125   3                  xd_tmp[offset + i] = pDat[i];
+ 126   3              }
+ 127   2      
+ 128   2              do
+ 129   2              {
+ 130   3                  IAPAL = 0x80;
+ 131   3                  IAPAH = 0x01;
+ 132   3                  IAPCN = PAGE_ERASE_SPROM;
+ 133   3                  IAPFD = 0xFF;
+ 134   3                  set_IAPTRG_IAPGO;
+ 135   3                  IAPCN = BYTE_PROGRAM_SPROM;
+ 136   3      
+ 137   3                  for (i = 0; i < 127; i++)
+ 138   3                  {
+ 139   4                      IAPFD = xd_tmp[i];
+ 140   4                      set_IAPTRG_IAPGO;
+ 141   4                      IAPAL++;
+ 142   4                  }
+ 143   3      
+ 144   3                  for (i = 0; i < 128; i++)
+ 145   3                  {
+ 146   4                      if (pCode[i] != xd_tmp[i])break;
+ 147   4                  }
+ 148   3              } while (i != 128);
+ 149   2      
+ 150   2          }
+ 151   1      
+ 152   1          clr_IAPUEN_SPUEN;
+ 153   1          clr_CHPCON_IAPEN;
+ 154   1      
+ 155   1          return num;
+ 156   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    829    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----     127
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      23
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

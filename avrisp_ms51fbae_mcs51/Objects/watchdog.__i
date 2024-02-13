@@ -1,0 +1,1 @@
+"watchdog.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(..\ws51fbae_test) DEBUG OBJECTEXTEND PRINT(.\Listings\watchdog.lst) OBJECT(.\Objects\watchdog.obj)

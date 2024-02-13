@@ -1,0 +1,1 @@
+"common.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(..\ws51fbae_test) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) OBJECT(.\Objects\common.obj)

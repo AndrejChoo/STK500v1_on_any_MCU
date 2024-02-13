@@ -1,0 +1,1 @@
+"src\processor.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(.\inc) DEBUG OBJECTEXTEND PRINT(.\Listings\processor.lst) OBJECT(.\Objects\processor.obj)
